@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist de Implantação - Patrimônio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-neon-yellow: #FFFF00;
+            --color-dark-gray: #333333;
+            --color-brown: #4B3621;
+            --color-black: #000000;
+            --color-light-gray: #555555;
+        }
+
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+            background: linear-gradient(135deg, var(--color-black) 0%, var(--color-dark-gray) 50%, var(--color-brown) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px var(--color-neon-yellow);
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            text-align: center;
+            color: var(--color-neon-yellow);
+            text-shadow: 0 0 10px var(--color-neon-yellow);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .checklist-section {
+            flex: 2;
+        }
+
+        .dashboard-section {
+            flex: 1;
+            background-color: var(--color-dark-gray);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .dashboard-section h2 {
+            color: var(--color-neon-yellow);
+            margin-top: 0;
+            border-bottom: 2px solid var(--color-neon-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Acordeão (Checklist) */
+        .accordion-item {
+            margin-bottom: 15px;
+            border: 1px solid var(--color-light-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .accordion-header {
+            background-color: var(--color-dark-gray);
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1em;
+            border-bottom: 2px solid transparent;
+            transition: background-color 0.3s, border-bottom-color 0.3s;
+        }
+
+        .accordion-header:hover {
+            background-color: var(--color-light-gray);
+        }
+
+        .accordion-header.completed {
+            border-bottom-color: var(--color-neon-yellow);
+        }
+
+        .accordion-header span.icon {
+            color: var(--color-neon-yellow);
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .accordion-header.active span.icon {
+            transform: rotate(90deg);
+        }
+
+        .accordion-content {
+            padding: 0 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+
+        .accordion-content.open {
+            max-height: 500px; /* Valor grande o suficiente para o conteúdo */
+            padding: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+
+        .checklist-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-neon-yellow);
+            border-radius: 4px;
+            margin-right: 10px;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            transition: background-color 0.2s;
+        }
+
+        .checklist-item input[type="checkbox"]:checked {
+            background-color: var(--color-neon-yellow);
+            border-color: var(--color-neon-yellow);
+        }
+
+        .checklist-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--color-black);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .checklist-item label {
+            flex-grow: 1;
+            transition: color 0.2s;
+        }
+
+        .checklist-item input[type="checkbox"]:checked + label {
+            color: var(--color-neon-yellow);
+            text-decoration: line-through;
+        }
+
+        /* Gráfico Donut */
+        .donut-chart-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+
+        .donut-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--color-neon-yellow) 0%,
+                var(--color-neon-yellow) 0%,
+                var(--color-light-gray) 0%,
+                var(--color-light-gray) 100%
+            );
+            transition: background 0.5s ease-in-out;
+        }
+
+        .donut-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background-color: var(--color-dark-gray);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 5px solid var(--color-black);
+        }
+
+        .percentage-text {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--color-neon-yellow);
+            text-shadow: 0 0 5px var(--color-neon-yellow);
+        }
+
+        .status-text {
+            font-size: 0.9em;
+            color: white;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+            .dashboard-section {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Checklist de Implantação - Patrimônio</h1>
+        </header>
+
+        <div class="dashboard">
+            <div class="checklist-section" id="checklist-container">
+                <!-- Itens do Checklist serão injetados aqui -->
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Progresso</h2>
+                <div class="donut-chart-container">
+                    <div class="donut-chart" id="donut-chart"></div>
+                    <div class="donut-center">
+                        <span class="percentage-text" id="percentage-text">0%</span>
+                        <span class="status-text">Concluído</span>
+                    </div>
+                </div>
+                <p id="progress-summary">0 de 0 tarefas concluídas.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const checklistData = [
+            {
+                title: "CONFIGURAR PARÂMETROS",
+                items: [
+                    "Informar data inicial",
+                    "Informar exceções",
+                    "Configurar cálculo do ICMS ciap",
+                    "Configurar cálculo dos créditos de PIS e COFINS (Lucro real)",
+                    "Configurar ganhos de capital",
+                    "Configurar integração contábil"
+                ],
+                info: "//Controle/Parâmetros"
+            },
+            {
+                title: "IMPORTAR CADASTROS INICIAIS",
+                items: [
+                    "Abrir cadastro de empresas",
+                    "Importar parâmetros do patrimônio da empresa exemplo"
+                ]
+            },
+            {
+                title: "CADASTRAR BEM MANUALMENTE",
+                items: [
+                    "//arquivos/bens",
+                    "Cadastrar todos os campos"
+                ]
+            },
+            {
+                title: "IMPORTAR BEM VIA APP",
+                items: [
+                    "Preencher planilha do cadastro de bens",
+                    "Realizar de-para no app",
+                    "Gerar arquivo e importar no sistema"
+                ]
+            },
+            {
+                title: "IMPORTAR VIA ESCRITA FISCAL",
+                items: [
+                    "Importar nota via portal na escrita fiscal",
+                    "Determinar CFOP de ativo imobilizado",
+                    "Clicar em GERAR BEM para abrir tela de cadastro da Escrita para cadastro do bem pelo mesmo"
+                ]
+            },
+            {
+                title: "CALCULAR DEPRECIAÇÃO E CIAP",
+                items: [
+                    "Calcular depreciação",
+                    "Atalhos da tela de cálculo"
+                ]
+            },
+            {
+                title: "GERAR RELATÓRIOS",
+                items: [
+                    "Relatórios de depreciação",
+                    "Relatório de crédito de ICMS",
+                    "Relatório de cadastro de bens"
+                ]
+            },
+            {
+                title: "INTEGRAR PARA CONTABILIDADE",
+                items: [
+                    "Rotina de integração",
+                    "Demonstrar no balancete integração da depreciação"
+                ]
+            },
+            {
+                title: "INTEGRAR BLOCO G - ESCRITA FISCAL",
+                items: [
+                    "Rotina de integração",
+                    "Demonstrar integração na escrita fiscal"
+                ]
+            }
+        ];
+
+        const checklistContainer = document.getElementById('checklist-container');
+        const donutChart = document.getElementById('donut-chart');
+        const percentageText = document.getElementById('percentage-text');
+        const progressSummary = document.getElementById('progress-summary');
+        let totalTasks = 0;
+        let completedTasks = 0;
+
+        // Função para renderizar o checklist
+        function renderChecklist() {
+            checklistData.forEach((section, sectionIndex) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'accordion-item';
+
+                const header = document.createElement('div');
+                header.className = 'accordion-header';
+                header.innerHTML = `
+                    ${section.title}
+                    <span class="icon">></span>
+                `;
+                header.setAttribute('data-section-index', sectionIndex);
+
+                const content = document.createElement('div');
+                content.className = 'accordion-content';
+
+                const ul = document.createElement('ul');
+                ul.style.listStyle = 'none';
+                ul.style.padding = '0';
+                ul.style.margin = '0';
+
+                section.items.forEach((itemText, itemIndex) => {
+                    totalTasks++;
+                    const li = document.createElement('li');
+                    li.className = 'checklist-item';
+                    li.innerHTML = `
+                        <input type="checkbox" id="task-${sectionIndex}-${itemIndex}">
+                        <label for="task-${sectionIndex}-${itemIndex}">${itemText}</label>
+                    `;
+                    li.querySelector('input').addEventListener('change', updateProgress);
+                    ul.appendChild(li);
+                });
+
+                if (section.info) {
+                    const infoP = document.createElement('p');
+                    infoP.style.marginTop = '10px';
+                    infoP.style.fontSize = '0.9em';
+                    infoP.style.color = 'var(--color-neon-yellow)';
+                    infoP.textContent = `Local: ${section.info}`;
+                    content.appendChild(infoP);
+                }
+
+                content.appendChild(ul);
+                accordionItem.appendChild(header);
+                accordionItem.appendChild(content);
+                checklistContainer.appendChild(accordionItem);
+
+                header.addEventListener('click', () => {
+                    const isActive = header.classList.contains('active');
+                    // Fecha todos os outros
+                    document.querySelectorAll('.accordion-header').forEach(h => {
+                        h.classList.remove('active');
+                        h.nextElementSibling.classList.remove('open');
+                    });
+
+                    // Abre ou fecha o clicado
+                    if (!isActive) {
+                        header.classList.add('active');
+                        content.classList.add('open');
+                    }
+                });
+            });
+            updateProgress(); // Inicializa o dashboard
+        }
+
+        // Função para atualizar o progresso e o gráfico
+        function updateProgress() {
+            completedTasks = 0;
+            document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(checkbox => {
+                if (checkbox.checked) {
+                    completedTasks++;
+                }
+            });
+
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            percentageText.textContent = `${percentage}%`;
+            progressSummary.textContent = `${completedTasks} de ${totalTasks} tarefas concluídas.`;
+
+            // Atualiza o gráfico donut
+            const gradientValue = percentage * 3.6; // 360 graus / 100% = 3.6
+            donutChart.style.background = `conic-gradient(
+                var(--color-neon-yellow) 0deg,
+                var(--color-neon-yellow) ${gradientValue}deg,
+                var(--color-light-gray) ${gradientValue}deg,
+                var(--color-light-gray) 360deg
+            )`;
+
+            // Atualiza o estado do cabeçalho do acordeão
+            checklistData.forEach((section, sectionIndex) => {
+                const header = document.querySelector(`.accordion-header[data-section-index="${sectionIndex}"]`);
+                const sectionCheckboxes = document.querySelectorAll(`#checklist-container input[id^="task-${sectionIndex}-"]`);
+                let sectionCompleted = 0;
+                sectionCheckboxes.forEach(cb => {
+                    if (cb.checked) {
+                        sectionCompleted++;
+                    }
+                });
+
+                if (sectionCompleted === sectionCheckboxes.length && sectionCheckboxes.length > 0) {
+                    header.classList.add('completed');
+                } else {
+                    header.classList.remove('completed');
+                }
+            });
+        }
+
+        // Inicializa a aplicação
+        renderChecklist();
+    </script>
+</body>
+</html>
